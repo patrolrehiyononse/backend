@@ -60,9 +60,12 @@ class PersonViewset(viewsets.ModelViewSet):
 
         User = get_user_model()
 
-        # User.objects.create_user(
-        #     email=request.data.get("email")
-        # )
+        User.objects.create_user(
+            username=request.data.get("full_name").lower().replace(" ", "_"),
+            email=request.data.get("email"),
+            password="123",
+            role="user"
+        )
 
         print(request.data)
 

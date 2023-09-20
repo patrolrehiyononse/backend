@@ -111,6 +111,8 @@ class UpdateLocation(APIView):
             print(get_transaction)
             if not get_transaction:
                 models.Transaction(
+                    created_by=request.user,
+                    modified_by=request.user,
                     persons=search_person,
                     lat=data.get("lat"),
                     lng=data.get("lng"),
@@ -120,6 +122,7 @@ class UpdateLocation(APIView):
             get_transaction.lat = data.get("lat")
             get_transaction.lng = data.get("lng")
             get_transaction.datetime = datetime.now(timezone.utc)
+            get_transaction.modified_by = request.user
             print(datetime.now(timezone.utc))
             get_transaction.save()
 
