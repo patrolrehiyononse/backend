@@ -105,25 +105,14 @@ class UpdateLocation(APIView):
         if get_email:
             search_person = get_object_or_404(models.Person, email=get_email)
 
-            # get_transaction = get_object_or_404(models.Transaction, persons=search_person)
-            get_transaction, created = models.Transaction.objects.get_or_create(
-                persons=search_person)
+            get_transaction, created = models.Transaction.objects.update_or_create(
+                persons=search_person,
+                defaults={
+                    'lat': data.get("lat"),
+                    'lng': data.get("lng"),
+                    'datetime': datetime.now(timezone.utc),
+                    'modified_by': request.user
+                })
             print(get_transaction)
-            if not get_transaction:
-                models.Transaction(
-                    created_by=request.user,
-                    modified_by=request.user,
-                    persons=search_person,
-                    lat=data.get("lat"),
-                    lng=data.get("lng"),
-                    datetime=datetime.now(timezone.utc)
-                ).save()
-            #
-            get_transaction.lat = data.get("lat")
-            get_transaction.lng = data.get("lng")
-            get_transaction.datetime = datetime.now(timezone.utc)
-            get_transaction.modified_by = request.user
-            print(datetime.now(timezone.utc))
-            get_transaction.save()
-
+            
         return Response(status=status.HTTP_200_OK)
