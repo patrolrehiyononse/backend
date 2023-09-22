@@ -23,6 +23,9 @@ ALLOWED_HOSTS = ['*', '13.229.203.108']
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+
 
 # Application definition
 

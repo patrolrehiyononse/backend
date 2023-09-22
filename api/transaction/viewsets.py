@@ -114,5 +114,5 @@ class UpdateLocation(APIView):
                     'modified_by': request.user
                 })
             print(get_transaction)
-            
+
         return Response(status=status.HTTP_200_OK)
