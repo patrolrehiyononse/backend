@@ -49,11 +49,11 @@ class Person(BaseModel):
     # first_name = models.CharField(max_length=255, null=True, blank=True)
     # middle_name = models.CharField(max_length=255, null=True, blank=True)
     person_unit = models.ForeignKey(Unit, null=True, blank=True,
-                                    on_delete=models.CASCADE)
+                                    on_delete=models.DO_NOTHING)
     person_rank = models.ForeignKey(Rank, null=True, blank=True,
-                                    on_delete=models.CASCADE)
+                                    on_delete=models.DO_NOTHING)
     person_station = models.ForeignKey("Station", null=True, blank=True,
-                                       on_delete=models.CASCADE)
+                                       on_delete=models.DO_NOTHING)
     email = models.EmailField(max_length=255, null=True, blank=True)
 
     def __str__(self):
@@ -61,7 +61,7 @@ class Person(BaseModel):
 
 
 class Transaction(BaseModel):
-    persons = models.ForeignKey(Person, null=True, on_delete=models.CASCADE,
+    persons = models.ForeignKey(Person, null=True, on_delete=models.DO_NOTHING,
                                 blank=True)
     lat = models.CharField(max_length=255, null=True, blank=True)
     lng = models.CharField(max_length=255, null=True, blank=True)
@@ -71,7 +71,7 @@ class Transaction(BaseModel):
 
 class SubUnit(BaseModel):
     units = models.ForeignKey(Unit, null=True, blank=True,
-                              on_delete=models.CASCADE)
+                              on_delete=models.DO_NOTHING)
     sub_unit_code = models.CharField(max_length=255, null=True, blank=True)
     sub_unit_description = models.CharField(max_length=255, null=True,
                                             blank=True)
@@ -89,4 +89,5 @@ class Station(BaseModel):
     description = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
-        return self.station_name + " - " + self.description
+        # return self.station_name + " - " + self.description
+        return self.station_name

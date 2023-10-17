@@ -49,42 +49,18 @@ class StationViewset(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
 
+        if request.data.get("sub_unit"):
+            sub_unit = request.data.pop("sub_unit")
+            get_obj = models.SubUnit.objects.get(sub_unit_code=sub_unit)
+            request.data["sub_unit"] = get_obj.id
+
         response = super(StationViewset, self).create(request, *args, **kwargs)
 
         return Response(response.data, status=status.HTTP_200_OK)
 
-    # class SubStationViewset(viewsets.ModelViewSet):
-    # 	pagination_class = Pagination
-    # 	queryset = models.SubStation.objects.all()
-    # 	serializer_class = serializers.SubStationSerializer
-    # 	authentication_classes = []
+class StationDropDown(APIView):
+    def get(self, request):
 
-    # 	def get_object(self):
-    # 		queryset = models.SubStation.objects.all()
-    # 		try:
-    # 			return queryset.filter(pk=self.kwargs["pk"])
-    # 		except:
-    # 			raise ValidationError(
-    # 				{
-    # 					"details": "not found or not exist"
-    # 				}
-    # 			)
-
-    # 	def list(self, request):
-    # 		obj = models.SubStation.objects.all()
-
-    # 		page = self.paginate_queryset(obj)
-
-    # 		if page is not None:
-    # 			serializer = self.get_serializer(page, many=True).data
-    # 			return self.get_paginated_response(serializer)
-
-    # 		serializer = self.get_serializer(obj, many=True).data
-    # 		return Response(serializer, status=status.HTTP_200_OK)
-
-    # def create(self, request, *args, **kwargs):
-    #
-    #     response = super(SubStationViewset, self).create(request, *args,
-    #                                                      **kwargs)
-    #
-    #     return Response(response.data, status=status.HTTP_200_OK)
+        obj = models.Station.objects.all()
+        serializer = serializers.StationSerializer(obj, many=True).data
+        return Response(serializer, status=status.HTTP_200_OK)

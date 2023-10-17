@@ -3,6 +3,7 @@ from rest_framework.serializers import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.views import APIView
 
 from app import models
 from . import serializers
@@ -83,6 +84,27 @@ class SubUnitViewset(viewsets.ModelViewSet):
 
 	def create(self, request, *args, **kwargs):
 
+		if request.data.get("unit"):
+			unit = request.data.pop("unit")
+			get_unit = models.Unit.objects.get(unit_code=unit)
+			request.data["units"] = get_unit.id
+
 		response = super(SubUnitViewset, self).create(request, *args, **kwargs)
 
 		return Response(response.data, status=status.HTTP_200_OK)
+
+class UnitDropDown(APIView):
+
+	def get(self, request):
+
+		obj = models.Unit.objects.all()
+		serializer = serializers.UnitSerializer(obj, many=True).data
+		return Response(serializer, status=status.HTTP_200_OK)
+
+class SubUnitDropDown(APIView):
+
+	def get(self, request):
+		obj = models.SubUnit.objects.all()
+
+		serializer = serializers.SubUnitSerializer(obj, many=True).data
+		return Response(serializer, status=status.HTTP_200_OK)

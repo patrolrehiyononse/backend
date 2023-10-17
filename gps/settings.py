@@ -19,7 +19,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', '13.229.203.108']
+ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
@@ -35,11 +35,14 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
     'app.apps.AppConfig',
     'users.apps.UsersConfig',
     'rest_framework',
     'corsheaders',
+    'django_extensions',
+    'channels',
+    "daphne",
+    'django.contrib.staticfiles',
 ]
 
 MIDDLEWARE = [
@@ -87,8 +90,19 @@ REST_FRAMEWORK = {
 
 WSGI_APPLICATION = 'gps.wsgi.application'
 
+ASGI_APPLICATION = 'gps.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [('127.0.0.1', 6379)],  # Replace with your Redis server details
+        },
+    },
+}
+
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 
     "AUTH_HEADER_TYPES": ("Bearer",),

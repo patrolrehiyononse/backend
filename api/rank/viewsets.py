@@ -3,6 +3,7 @@ from rest_framework.serializers import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.views import APIView
 
 from app import models
 from . import serializers
@@ -52,3 +53,11 @@ class RankViewset(viewsets.ModelViewSet):
 
 		return Response(response.data, status=status.HTTP_200_OK)
 
+
+class RankDropDown(APIView):
+
+	def get(self, request):
+
+		obj = models.Rank.objects.all()
+		serializer = serializers.RankSerializer(obj, many=True).data
+		return Response(serializer, status=status.HTTP_200_OK)
