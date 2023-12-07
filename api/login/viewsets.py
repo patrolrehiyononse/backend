@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
 
 from django.contrib.auth.hashers import make_password
 
@@ -52,8 +53,22 @@ class CustomLogin(TokenObtainPairView):
         if user.check_password(password):
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
-            return Response({'access_token': access_token, 'role': user.role},
+            return Response({'access_token': access_token,
+                             'refresh_token': str(refresh),
+                             'role': user.role},
                             status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid email or password'},
                             status=status.HTTP_400_BAD_REQUEST)
+
+class RequestCode(APIView):
+
+    def post(self, request, *args, **kwargs):
+        subject = 'Your 2FA Code'
+        message = f'Your 2FA code is: test'
+        from_email = 'gremoryrias070@gmail.com'
+        recipient_list = ['ianautentico598@gmail.com']
+
+        send_mail(subject, message, from_email, recipient_list,
+                  fail_silently=False)
+        return Response({'message': '2FA code sent'})
