@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 
 from django.contrib.auth.hashers import make_password
+from django.utils.crypto import get_random_string
 
 from app import models
 from . import serializers
@@ -59,16 +60,42 @@ class CustomLogin(TokenObtainPairView):
                             status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid email or password'},
-                            status=status.HTTP_400_BAD_REQUEST)
+                            status=status.HTTP_401_UNAUTHORIZED)
 
 class RequestCode(APIView):
 
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
+        user = request.user
         subject = 'Your 2FA Code'
-        message = f'Your 2FA code is: test'
-        from_email = 'gremoryrias070@gmail.com'
-        recipient_list = ['ianautentico598@gmail.com']
+        code = get_random_string(length=6)
+
+        user.twofactor_code = code
+        user.save()
+
+        message = f'Your 2FA code is: {code}'
+        from_email = 'patroleleven@gmail.com'
+
+        # recipient_list = request.data.get("email_list")
+
+        user = request.user
+        recipient_list = [user.email]
+
 
         send_mail(subject, message, from_email, recipient_list,
                   fail_silently=False)
         return Response({'message': '2FA code sent'})
+
+class VerifyCode(APIView):
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        code = request.data.get('code', '')
+        print(user.twofactor_code)
+        print(code)
+        if user.twofactor_code == code:
+            # Code is valid, perform the desired action
+            user.twofactor_code = ''  # Clear the code
+            user.save()
+            return Response({'message': '2FA code verified'})
+        else:
+            return Response({'message': 'Invalid 2FA code'}, status=400)

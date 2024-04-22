@@ -11,9 +11,6 @@ from . import serializers
 
 
 class Pagination(PageNumberPagination):
-    # page_size_query_param = 'page_size'
-    # page_size = 25
-    # max_page_size = 25
     page_size = 5
     page_size_query_param = 'page_size'
     max_page_size = 10
@@ -98,9 +95,7 @@ class UpdateLocation(APIView):
 
     def post(self, request):
         get_email = request.query_params.get("email", None)
-        print(get_email)
         data = request.data
-        print(data)
 
         if get_email:
             search_person = get_object_or_404(models.Person, email=get_email)

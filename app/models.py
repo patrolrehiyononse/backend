@@ -91,3 +91,8 @@ class Station(BaseModel):
     def __str__(self):
         # return self.station_name + " - " + self.description
         return self.station_name
+
+class Geofencing(BaseModel):
+    name = models.CharField(max_length=255, null=True, blank=True)
+    coordinates = models.CharField(max_length=255, null=True, blank=True)
+    center = models.CharField(max_length=255, null=True, blank=True)

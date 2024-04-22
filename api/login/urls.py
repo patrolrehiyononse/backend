@@ -11,5 +11,6 @@ from . import viewsets
 
 urlpatterns = [
 	path('login/', viewsets.CustomLogin.as_view(), name='login'),
-	path('request_code/', viewsets.RequestCode.as_view(), name="request_code")
+	path('request_code/', viewsets.RequestCode.as_view(), name="request_code"),
+	path('verify_code/', viewsets.VerifyCode.as_view(), name="verify_code")
 ]
