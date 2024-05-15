@@ -55,14 +55,20 @@ class CustomLogin(TokenObtainPairView):
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
 
+            if user.role == "admin":
+                return Response({'access_token': access_token,
+                                 'refresh_token': str(refresh),
+                                 'role': user.role,
+                                 },
+                                status=status.HTTP_200_OK)
             person = models.Person.objects.get(email=user.email)
-
             return Response({'access_token': access_token,
                              'refresh_token': str(refresh),
                              'role': user.role,
                              'unit': person.person_unit.description
                              },
                             status=status.HTTP_200_OK)
+
         else:
             return Response({'error': 'Invalid email or password'},
                             status=status.HTTP_401_UNAUTHORIZED)
