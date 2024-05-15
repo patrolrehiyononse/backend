@@ -3,6 +3,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 # Create your models here.
 
+from app.models import Person
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -30,7 +32,6 @@ class CustomUser(AbstractUser, PermissionsMixin):
         ('user', 'user'),
         # Add more role choices as needed
     ]
-
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=255, null=True, blank=True)
 

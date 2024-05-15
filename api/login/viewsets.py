@@ -12,7 +12,7 @@ from django.contrib.auth.hashers import make_password
 from django.utils.crypto import get_random_string
 
 from app import models
-from . import serializers
+from api.person import serializers
 
 
 class LoginView(APIView):
@@ -54,9 +54,14 @@ class CustomLogin(TokenObtainPairView):
         if user.check_password(password):
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
+
+            person = models.Person.objects.get(email=user.email)
+
             return Response({'access_token': access_token,
                              'refresh_token': str(refresh),
-                             'role': user.role},
+                             'role': user.role,
+                             'unit': person.person_unit.description
+                             },
                             status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid email or password'},

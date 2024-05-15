@@ -10,5 +10,6 @@ router.register(r"geofencing", viewsets.GeofencingViewset)
 
 
 urlpatterns = [
-	path('', include(router.urls))
+	path('', include(router.urls)),
+	path('get_geofencing/', viewsets.GetGeofencing.as_view())
 ]

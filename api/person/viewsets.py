@@ -60,16 +60,17 @@ class PersonViewset(viewsets.ModelViewSet):
 
         User = get_user_model()
 
+
+        response = super(PersonViewset, self).create(request, *args, **kwargs)
+
         User.objects.create_user(
             username=request.data.get("full_name").lower().replace(" ", "_"),
             email=request.data.get("email"),
             password="123",
-            role="user"
+            role="user",
         )
 
-        print(request.data)
-
-        response = super(PersonViewset, self).create(request, *args, **kwargs)
+        print(response)
 
         return Response(response.data, status=status.HTTP_200_OK)
 

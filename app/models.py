@@ -49,11 +49,13 @@ class Person(BaseModel):
     # first_name = models.CharField(max_length=255, null=True, blank=True)
     # middle_name = models.CharField(max_length=255, null=True, blank=True)
     person_unit = models.ForeignKey(Unit, null=True, blank=True,
-                                    on_delete=models.DO_NOTHING)
+                                    on_delete=models.CASCADE)
     person_rank = models.ForeignKey(Rank, null=True, blank=True,
-                                    on_delete=models.DO_NOTHING)
+                                    on_delete=models.CASCADE)
     person_station = models.ForeignKey("Station", null=True, blank=True,
-                                       on_delete=models.DO_NOTHING)
+                                       on_delete=models.CASCADE)
+    person_sub_unit = models.ForeignKey("SubUnit", null=True, blank=True,
+                                       on_delete=models.CASCADE)
     email = models.EmailField(max_length=255, null=True, blank=True)
 
     def __str__(self):
@@ -61,7 +63,7 @@ class Person(BaseModel):
 
 
 class Transaction(BaseModel):
-    persons = models.ForeignKey(Person, null=True, on_delete=models.DO_NOTHING,
+    persons = models.ForeignKey(Person, null=True, on_delete=models.CASCADE,
                                 blank=True)
     lat = models.CharField(max_length=255, null=True, blank=True)
     lng = models.CharField(max_length=255, null=True, blank=True)
@@ -71,7 +73,7 @@ class Transaction(BaseModel):
 
 class SubUnit(BaseModel):
     units = models.ForeignKey(Unit, null=True, blank=True,
-                              on_delete=models.DO_NOTHING)
+                              on_delete=models.CASCADE)
     sub_unit_code = models.CharField(max_length=255, null=True, blank=True)
     sub_unit_description = models.CharField(max_length=255, null=True,
                                             blank=True)
@@ -94,5 +96,9 @@ class Station(BaseModel):
 
 class Geofencing(BaseModel):
     name = models.CharField(max_length=255, null=True, blank=True)
-    coordinates = models.CharField(max_length=255, null=True, blank=True)
+    # coordinates = models.CharField(null=True, blank=True)
+    coordinates = models.TextField(null=True, blank=True)
     center = models.CharField(max_length=255, null=True, blank=True)
+
+    def __str__(self):
+        return self.name + " " + str(self.pk)

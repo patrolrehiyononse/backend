@@ -27,10 +27,10 @@ class GeofencingViewset(viewsets.ModelViewSet):
 
         return Response(response.data, status=status.HTTP_200_OK)
 
-    def retrieve(self, request, **kwargs):
-        obj = Geofencing.objects.get(pk=kwargs['pk'])
+class GetGeofencing(APIView):
 
-        serializer = self.get_serializer(obj).data
-
+    def get(self, request):
+        get_unit = request.query_params.get("unit", None)
+        obj = Geofencing.objects.get(name=get_unit)
+        serializer = GeofencingSerializer(obj).data
         return Response(serializer, status=status.HTTP_200_OK)
-
