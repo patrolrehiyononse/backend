@@ -33,7 +33,6 @@ class Unit(BaseModel):
     def __str__(self):
         return self.description + " - " + self.unit_code
 
-
 class Rank(BaseModel):
     rank_code = models.CharField(max_length=255, null=True, blank=True)
     description = models.CharField(max_length=255, null=True, blank=True)
@@ -45,9 +44,6 @@ class Rank(BaseModel):
 class Person(BaseModel):
     account_number = models.IntegerField(null=True, blank=True)
     full_name = models.CharField(max_length=256, null=True, blank=True)
-    # last_name = models.CharField(max_length=255, null=True, blank=True)
-    # first_name = models.CharField(max_length=255, null=True, blank=True)
-    # middle_name = models.CharField(max_length=255, null=True, blank=True)
     person_unit = models.ForeignKey(Unit, null=True, blank=True,
                                     on_delete=models.CASCADE)
     person_rank = models.ForeignKey(Rank, null=True, blank=True,
@@ -60,6 +56,12 @@ class Person(BaseModel):
 
     def __str__(self):
         return self.full_name + " - " + self.email
+
+
+class PathTrace(BaseModel):
+    persons = models.ForeignKey(Person, null=True, blank=True,
+                               on_delete=models.CASCADE)
+    path_line = models.JSONField(null=True, blank=True)
 
 
 class Transaction(BaseModel):
@@ -97,7 +99,8 @@ class Station(BaseModel):
 class Geofencing(BaseModel):
     name = models.CharField(max_length=255, null=True, blank=True)
     # coordinates = models.CharField(null=True, blank=True)
-    coordinates = models.TextField(null=True, blank=True)
+    # coordinates = models.TextField(null=True, blank=True)
+    coordinates = models.JSONField(null=True, blank=True)
     center = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):

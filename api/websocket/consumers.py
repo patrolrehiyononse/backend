@@ -6,18 +6,29 @@ from datetime import datetime, timezone
 from asgiref.sync import sync_to_async
 from django.contrib.auth import get_user_model
 
+from api.transaction.serializers import TransactionSerializer
+
 class WebSocketConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        await self.channel_layer.group_add("gps_group", self.channel_name)
         await self.accept()
 
     async def disconnect(self, close_code):
-        pass
+        await self.channel_layer.group_discard("gps_group", self.channel_name)
 
     async def receive(self, text_data):
         data = json.loads(text_data)
 
         await self.process_gps_data(data)
         await self.send(text_data=json.dumps(data))
+
+        await self.channel_layer.group_send(
+            "gps_group",
+            {
+                "type": "gps_data_message",
+                "message": data,
+            }
+        )
 
     @sync_to_async
     def process_gps_data(self, data):
@@ -45,9 +56,39 @@ class WebSocketConsumer(AsyncWebsocketConsumer):
                     'datetime': datetime.now(timezone.utc),
                     'modified_by': get_user
                 })
-            print(get_transaction)
-            print(get_user)
 
         # Respond back to the client (if needed)
         response_data = {'message': 'GPS data received'}
-        self.send(text_data=json.dumps(response_data))
+        # self.send(text_data=json.dumps(response_data))
+
+    async def gps_data_message(self, event):
+        message = event['message']
+        await self.send(text_data=json.dumps(message))
+
+class DashboardMapConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.channel_layer.group_add("gps_group", self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard("gps_group", self.channel_name)
+
+    async def receive(self, text_data):
+        # This consumer does not need to process received data
+        # response = await self.dashboard_map()
+        # print(response)
+        # print("asdasd")
+        pass
+
+    @sync_to_async
+    def dashboard_map(self):
+        all_trans = models.Transaction.objects.all()
+        trans_serialize = TransactionSerializer(all_trans, many=True).data
+
+        return trans_serialize
+
+    async def gps_data_message(self, event):
+        message = event['message']
+        response = await self.dashboard_map()
+
+        await self.send(text_data=json.dumps(response))
