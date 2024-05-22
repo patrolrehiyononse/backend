@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_extensions',
     'channels',
-    "daphne",
+#    "daphne",
     'django.contrib.staticfiles',
 ]
 
