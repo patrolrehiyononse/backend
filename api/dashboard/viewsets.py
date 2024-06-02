@@ -28,3 +28,11 @@ class DashboardTable(APIView):
                                                                  many=True).data
 
         return Response(trans_serialize, status=status.HTTP_200_OK)
+
+class PersonDropDown(APIView):
+
+    def get(self, request):
+        obj = models.Person.objects.all()
+        serializer = person_serializer.PersonSerializer(obj, many=True).data
+
+        return Response(serializer, status=status.HTTP_200_OK)
