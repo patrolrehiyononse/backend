@@ -6,6 +6,7 @@ from . import viewsets
 router = DefaultRouter()
 
 router.register(r"transaction", viewsets.TransactionViewset)
+router.register(r"deployed_units", viewsets.DeployedUnitsViewSet)
 
 
 urlpatterns = [

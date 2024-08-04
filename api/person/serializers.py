@@ -11,8 +11,7 @@ class PersonSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = models.Person
-		fields = ['id', 'full_name', 'email', 'rank', 'unit', 'station', 'created_by',
-		'created_date', 'modified_date', 'modified_by', 'person_unit', 'person_rank', 'person_station']
+		fields = ['id', 'full_name', 'email', 'rank', 'unit', 'station', 'person_unit', 'person_rank', 'person_station']
 
 	def get_rank(self, instance):
 		return RankSerializer(instance.person_rank).data

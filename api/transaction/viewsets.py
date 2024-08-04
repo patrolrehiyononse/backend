@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 from datetime import datetime, timezone
+from rest_framework.decorators import action
 
 from app import models
 from . import serializers
@@ -111,3 +112,89 @@ class UpdateLocation(APIView):
             print(get_transaction)
 
         return Response(status=status.HTTP_200_OK)
+
+class DeployedUnitsViewSet(viewsets.ModelViewSet):
+    queryset = models.DeployedUnits.objects.all()
+    serializer_class = serializers.DeployedUnitsSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def retrieve(self, request, pk=None):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+
+    def list(self, request, *args, **kwargs):
+        queryset = models.DeployedUnits.objects.all()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['patch'], url_path='update-arrival-status')
+    def update_arrival_status(self, request, pk=None):
+        person_id = request.data.get('person_id')
+        is_arrived = request.data.get('is_arrived')
+
+        if person_id is None or is_arrived is None:
+            return Response(
+                {'error': 'person_id and is_arrived fields are required.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            deployment_person = models.DeployedUnitPerson.objects.get(
+                deployed_unit_id=pk, person_id=person_id)
+            deployment_person.is_arrived = is_arrived
+            deployment_person.save()
+
+            # Check if all persons have arrived
+            deployment = models.DeployedUnits.objects.get(pk=pk)
+            all_arrived = all(person.is_arrived for person in
+                              deployment.deployedunitperson_set.all())
+
+            if all_arrived:
+                deployment.is_done = True
+                deployment.save()
+            else:
+                deployment.is_done = False
+                deployment.save()
+
+
+            serializer = self.get_serializer(deployment)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except models.DeployedUnitPerson.DoesNotExist:
+            return Response({'error': 'DeployedUnitPerson not found.'},
+                            status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(
+                {'error': 'An error occurred while updating arrival status.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=False, methods=['get'], url_path='by-person')
+    def get_by_person(self, request):
+        person_id = request.query_params.get('person_id')
+        if not person_id:
+            return Response(
+                {'error': 'person_id query parameter is required.'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            deployed_units = models.DeployedUnits.objects.filter(
+                persons__id=person_id, is_done=False)
+            serializer = self.get_serializer(deployed_units, many=True)
+            return Response(serializer.data)
+        except models.DeployedUnits.DoesNotExist:
+            return Response(
+                {'error': 'No deployed units found for the given person_id.'},
+                status=status.HTTP_404_NOT_FOUND)

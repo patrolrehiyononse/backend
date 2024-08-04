@@ -65,7 +65,8 @@ class CustomLogin(TokenObtainPairView):
             return Response({'access_token': access_token,
                              'refresh_token': str(refresh),
                              'role': user.role,
-                             'unit': person.person_unit.description
+                             'unit': person.person_sub_unit.sub_unit_description,
+                             'id': person.id
                              },
                             status=status.HTTP_200_OK)
 

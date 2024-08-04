@@ -12,4 +12,5 @@ from . import viewsets
 urlpatterns = [
 	path('dashboard/', viewsets.DashboardTable.as_view()),
 	path('person_dropdown/', viewsets.PersonDropDown.as_view()),
+	path('delete_all_path_traces/', viewsets.DeleteAllPathTraces.as_view()),
 ]

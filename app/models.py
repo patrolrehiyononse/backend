@@ -61,7 +61,12 @@ class Person(BaseModel):
 class PathTrace(BaseModel):
     persons = models.ForeignKey(Person, null=True, blank=True,
                                on_delete=models.CASCADE)
-    path_line = models.JSONField(null=True, blank=True)
+    lat = models.CharField(max_length=255, null=True, blank=True)
+    lng = models.CharField(max_length=255, null=True, blank=True)
+    datetime = models.DateTimeField(max_length=255, null=True, blank=True)
+
+    def __str__(self):
+        return self.persons.full_name
 
 
 class Transaction(BaseModel):
@@ -69,6 +74,7 @@ class Transaction(BaseModel):
                                 blank=True)
     lat = models.CharField(max_length=255, null=True, blank=True)
     lng = models.CharField(max_length=255, null=True, blank=True)
+    location = models.CharField(max_length=255, null=True, blank=True)
     datetime = models.DateTimeField(max_length=255, null=True, blank=True)
     is_active = models.BooleanField(default=False)
 
@@ -105,3 +111,19 @@ class Geofencing(BaseModel):
 
     def __str__(self):
         return self.name + " " + str(self.pk)
+
+class DeployedUnitPerson(models.Model):
+    deployed_unit = models.ForeignKey('DeployedUnits', on_delete=models.CASCADE)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    is_arrived = models.BooleanField(null=True, blank=True, default=False)
+
+
+class DeployedUnits(BaseModel):
+    persons = models.ManyToManyField(Person, through='DeployedUnitPerson')
+    destination = models.CharField(max_length=500, null=True, blank=True)
+    deployment_name = models.CharField(max_length=255, null=True, blank=True)
+    coordinates = models.CharField(max_length=255, null=True, blank=True)
+    is_done = models.BooleanField(null=True, blank=True, default=False)
+
+    # def __str__(self):
+    #     return self.deployment_name

@@ -36,3 +36,10 @@ class PersonDropDown(APIView):
         serializer = person_serializer.PersonSerializer(obj, many=True).data
 
         return Response(serializer, status=status.HTTP_200_OK)
+
+class DeleteAllPathTraces(APIView):
+
+    def get(self, request):
+        models.PathTrace.objects.all().delete()
+
+        return Response("All Path Traces Deleted", status=status.HTTP_200_OK)

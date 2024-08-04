@@ -7,6 +7,8 @@ from django.contrib.auth import get_user_model
 from app import models
 from . import serializers
 
+from rest_framework.views import APIView
+
 
 class Pagination(PageNumberPagination):
     # page_size_query_param = 'page_size'
@@ -73,4 +75,3 @@ class PersonViewset(viewsets.ModelViewSet):
         print(response)
 
         return Response(response.data, status=status.HTTP_200_OK)
-
