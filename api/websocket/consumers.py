@@ -123,14 +123,14 @@ class DashboardMapConsumer(AsyncWebsocketConsumer):
         if self.scope["user"].is_authenticated:
             self.user = self.scope["user"]
             self.group_name = f"user_{self.user.id}"
-            await self.channel_layer.group_add(self.group_name,
+            await self.channel_layer.group_add("admin_group",
                                                self.channel_name)
             await self.accept()
         else:
             await self.close()
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.group_name,
+        await self.channel_layer.group_discard("admin_group",
                                                self.channel_name)
 
     async def receive(self, text_data):
