@@ -60,6 +60,11 @@ class PersonViewset(viewsets.ModelViewSet):
             get_unit = get_object_or_404(models.Unit, unit_code=unit)
             request.data['person_unit'] = get_unit.pk
 
+        if request.data.get("sub_unit"):
+            unit = request.data.pop("sub_unit")
+            get_sub_unit = get_object_or_404(models.SubUnit, unit_code=unit)
+            request.data['person_sub_unit'] = get_sub_unit.pk
+
         User = get_user_model()
 
 
