@@ -77,6 +77,4 @@ class PersonViewset(viewsets.ModelViewSet):
             role="user",
         )
 
-        print(response)
-
         return Response(response.data, status=status.HTTP_200_OK)
