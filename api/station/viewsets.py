@@ -58,6 +58,27 @@ class StationViewset(viewsets.ModelViewSet):
 
         return Response(response.data, status=status.HTTP_200_OK)
 
+    def update(self, request, pk=None, **kwargs):
+        data = request.data
+        get_subunit = None
+        if data.get("sub_unit"):
+            get_value = data.pop("sub_unit")
+            get_subunit = get_object_or_404(
+                models.SubUnit, sub_unit_code=get_value['sub_unit_code'])
+
+        get_station = get_object_or_404(models.Station, id=pk)
+        get_station.sub_unit = get_subunit
+        get_station.station_code = data.get("station_code")
+        get_station.station_name = data.get("station_name")
+        get_station.description = data.get("description")
+        get_station.save()
+
+        return Response(status=status.HTTP_200_OK)
+
+    def destroy(self, request, pk=None):
+        get_object_or_404(models.Station, id=pk).delete()
+        return Response(status=status.HTTP_200_OK)
+
 class StationDropDown(APIView):
     def get(self, request):
 

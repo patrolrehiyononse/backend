@@ -39,9 +39,18 @@ class TransactionViewset(viewsets.ModelViewSet):
         # station = request.query_params("station", None)
         get_obj = request.query_params.get("object", None)
         value = request.query_params.get("value", None)
+        obj = None
+
+        if request.user.is_superuser:
+            obj = models.Transaction.objects.all().order_by("id")
+        else:
+            get_sub_unit = request.user.sub_unit
+            obj = models.Transaction.objects.filter(
+                persons__person_sub_unit__sub_unit_description=get_sub_unit)
+
 
         if get_obj == "person":
-            by_person = models.Transaction.objects.filter(
+            by_person = obj.filter(
                 persons__full_name__contains=value).order_by("id")
             page = self.paginate_queryset(by_person)
 
@@ -50,7 +59,7 @@ class TransactionViewset(viewsets.ModelViewSet):
                 return self.get_paginated_response(serializer)
 
         if get_obj == "unit":
-            by_unit = models.Transaction.objects.filter(
+            by_unit = obj.filter(
                 persons__person_unit__unit_code__contains=value).order_by("id")
             page = self.paginate_queryset(by_unit)
 
@@ -59,7 +68,7 @@ class TransactionViewset(viewsets.ModelViewSet):
                 return self.get_paginated_response(serializer)
 
         if get_obj == "station":
-            by_station = models.Transaction.objects.filter(
+            by_station = obj.filter(
                 persons__person_station__station_name__contains=value).order_by(
                 "id")
             page = self.paginate_queryset(by_station)
@@ -68,7 +77,7 @@ class TransactionViewset(viewsets.ModelViewSet):
                 serializer = self.get_serializer(page, many=True).data
                 return self.get_paginated_response(serializer)
 
-        obj = models.Transaction.objects.all().order_by("id")
+
 
         page = self.paginate_queryset(obj)
 

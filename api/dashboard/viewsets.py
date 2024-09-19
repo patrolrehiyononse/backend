@@ -9,6 +9,9 @@ from app import models
 
 from api.transaction import serializers as trans_serializer
 from api.person import serializers as person_serializer
+from api.rank import serializers as rank_serializer
+from api.unit import serializers as unit_serializer
+from api.station import serializers as station_serializer
 
 
 class DashboardTable(APIView):
@@ -32,7 +35,12 @@ class DashboardTable(APIView):
 class PersonDropDown(APIView):
 
     def get(self, request):
-        obj = models.Person.objects.all()
+        if request.user.is_superuser:
+            obj = models.Person.objects.all()
+        else:
+            get_sub_unit = request.user.sub_unit
+            obj = models.Person.objects.filter(
+                person_sub_unit__sub_unit_description=get_sub_unit)
         serializer = person_serializer.PersonSerializer(obj, many=True).data
 
         return Response(serializer, status=status.HTTP_200_OK)

@@ -53,6 +53,20 @@ class UnitViewset(viewsets.ModelViewSet):
 
 		return Response(response.data, status=status.HTTP_200_OK)
 
+	def update(self, request, pk=None, **kwargs):
+		data = request.data
+
+		get_unit = get_object_or_404(models.Unit, id=pk)
+
+		get_unit.unit_code = data.get("unit_code")
+		get_unit.description = data.get("description")
+		get_unit.save()
+
+		return Response(status=status.HTTP_200_OK)
+
+	def destroy(self, request, pk=None):
+		get_object_or_404(models.Unit, id=pk).delete()
+		return Response(status=status.HTTP_200_OK)
 
 class SubUnitViewset(viewsets.ModelViewSet):
 	pagination_class = Pagination
@@ -92,6 +106,29 @@ class SubUnitViewset(viewsets.ModelViewSet):
 		response = super(SubUnitViewset, self).create(request, *args, **kwargs)
 
 		return Response(response.data, status=status.HTTP_200_OK)
+
+	def update(self, request, pk=None, **kwargs):
+
+		data = request.data
+		get_unit = None
+
+		if data.get("unit"):
+			unit = data.pop("unit")
+			get_unit = get_object_or_404(models.Unit, unit_code=unit['unit_code'])
+
+
+		get_subunit = get_object_or_404(models.SubUnit, id=pk)
+		get_subunit.units = get_unit
+		get_subunit.sub_unit_code = data.get("sub_unit_code")
+		get_subunit.sub_unit_description = data.get("sub_unit_description")
+		get_subunit.save()
+
+		return Response(status=status.HTTP_200_OK)
+
+	def destroy(self, request, pk=None):
+		get_object_or_404(models.SubUnit, id=pk).delete()
+		return Response(status=status.HTTP_200_OK)
+
 
 class UnitDropDown(APIView):
 

@@ -29,7 +29,7 @@ class CustomUser(AbstractUser, PermissionsMixin):
 
     ROLE_CHOICES = [
         ('admin', 'Admin'),
-        ('user', 'user'),
+        ('user', 'User'),
         # Add more role choices as needed
     ]
     email = models.EmailField(unique=True)
@@ -37,12 +37,14 @@ class CustomUser(AbstractUser, PermissionsMixin):
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 
     twofactor_code = models.CharField(max_length=6, blank=True, null=True)
 
     role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='user')
+    sub_unit = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.username

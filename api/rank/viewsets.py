@@ -53,6 +53,20 @@ class RankViewset(viewsets.ModelViewSet):
 
 		return Response(response.data, status=status.HTTP_200_OK)
 
+	def update(self, request, pk=None, **kwargs):
+		data = request.data
+
+		get_rank = get_object_or_404(models.Rank, id=pk)
+
+		get_rank.rank_code = data.get("rank_code")
+		get_rank.description = data.get("description")
+		get_rank.save()
+
+		return Response(status=status.HTTP_200_OK)
+
+	def destroy(self, request, pk=None):
+		get_object_or_404(models.Rank, id=pk).delete()
+		return Response(status=status.HTTP_200_OK)
 
 class RankDropDown(APIView):
 

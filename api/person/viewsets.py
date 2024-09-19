@@ -37,7 +37,14 @@ class PersonViewset(viewsets.ModelViewSet):
             )
 
     def list(self, request):
-        obj = models.Person.objects.all()
+        obj = None
+
+        if request.user.is_superuser:
+            obj = models.Person.objects.all()
+        else:
+            get_sub_unit = request.user.sub_unit
+            obj = models.Person.objects.filter(
+                person_sub_unit__sub_unit_description=get_sub_unit)
 
         page = self.paginate_queryset(obj)
 
@@ -83,3 +90,42 @@ class PersonViewset(viewsets.ModelViewSet):
         )
 
         return Response(response.data, status=status.HTTP_200_OK)
+
+    def update(self, request, pk=None, **kwargs):
+        data = request.data
+        get_rank = None
+        get_unit = None
+        get_subunit = None
+        get_station = None
+
+        person = models.Person.objects.get(pk=pk)
+
+        if data.get("rank"):
+            get_rank = models.Rank.objects.get(rank_code=data.get("rank")['rank_code'])
+        if data.get("unit"):
+            get_unit = models.Unit.objects.get(description=data.get("unit")['description'])
+        if data.get("sub_unit"):
+            get_subunit = models.SubUnit.objects.get(sub_unit_description=data.get("sub_unit")['sub_unit_description'])
+        if data.get("station"):
+            get_station = models.Station.objects.get(description=data.get("station")['description'])
+
+        person.full_name = data.get("full_name")
+        person.email = data.get("email")
+        person.person_rank = get_rank
+        person.person_unit = get_unit
+        person.person_sub_unit = get_subunit
+        person.person_station = get_station
+        person.save()
+
+        response = serializers.PersonSerializer(person)
+
+        return Response(response.data, status=status.HTTP_200_OK)
+
+    def destroy(self, request, pk=None):
+
+        get_person = get_object_or_404(models.Person, id=pk)
+        get_person.delete()
+
+        return Response(status=status.HTTP_200_OK)
+
+
