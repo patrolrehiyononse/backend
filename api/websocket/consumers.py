@@ -21,9 +21,9 @@ class WebSocketConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         if self.scope["user"].is_authenticated:
             self.user = self.scope["user"]
-            self.group_name = f"user_{self.user.id}"
-            await self.channel_layer.group_add(self.group_name,
-                                               self.channel_name)
+            # self.group_name = f"user_{self.user.id}"
+            # await self.channel_layer.group_add(self.group_name,
+            #                                    self.channel_name)
             await self.channel_layer.group_add("admin_group",
                                                self.channel_name)
             await self.accept()
@@ -31,8 +31,8 @@ class WebSocketConsumer(AsyncWebsocketConsumer):
             await self.close()
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.group_name,
-                                               self.channel_name)
+        # await self.channel_layer.group_discard(self.group_name,
+        #                                        self.channel_name)
         await self.channel_layer.group_discard("admin_group",
                                                self.channel_name)
 
@@ -42,14 +42,14 @@ class WebSocketConsumer(AsyncWebsocketConsumer):
 
         await self.process_gps_data(data)
 
-        await self.channel_layer.group_send(
-            self.group_name,
-            {
-                "type": "gps_data_message",
-                "message": data,
-                "user_id": self.user.id
-            }
-        )
+        # await self.channel_layer.group_send(
+        #     self.group_name,
+        #     {
+        #         "type": "gps_data_message",
+        #         "message": data,
+        #         "user_id": self.user.id
+        #     }
+        # )
 
         await self.channel_layer.group_send(
             "admin_group",
