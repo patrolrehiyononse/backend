@@ -122,7 +122,7 @@ class DashboardMapConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         if self.scope["user"].is_authenticated:
             self.user = self.scope["user"]
-            self.group_name = f"user_{self.user.id}"
+            #self.group_name = f"user_{self.user.id}"
             await self.channel_layer.group_add("admin_group",
                                                self.channel_name)
             await self.accept()
@@ -165,7 +165,7 @@ class TrackPersonConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         if self.scope["user"].is_authenticated:
             self.user = self.scope["user"]
-            self.group_name = f"user_{self.user.id}"
+            #self.group_name = f"user_{self.user.id}"
             await self.channel_layer.group_add("admin_group",
                                                self.channel_name)
             await self.accept()
